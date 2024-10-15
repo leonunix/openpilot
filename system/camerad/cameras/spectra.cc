@@ -281,7 +281,7 @@ void SpectraCamera::camera_open(VisionIpcServer *v, cl_device_id device_id, cl_c
 
   open = true;
   configISP();
-  configICP();
+  if (is_raw) configICP();
   configCSIPHY();
   linkDevices();
 
@@ -832,13 +832,15 @@ void SpectraCamera::enqueue_buffer(int i, bool dp) {
       // TODO: handle frame drop cleanly
     }
 
-    // wait for bps
-    sync_wait.sync_obj = sync_objs_bps_out[i];
-    sync_wait.timeout_ms = 50; // max dt tolerance, typical should be 23
-    ret = do_sync_control(m->cam_sync_fd, CAM_SYNC_WAIT, &sync_wait, sizeof(sync_wait));
-    if (ret != 0) {
-      LOGE("failed to wait for sync: %d %d", ret, sync_wait.sync_obj);
-      // TODO: handle frame drop cleanly
+    if (is_raw) {
+      // wait for bps
+      sync_wait.sync_obj = sync_objs_bps_out[i];
+      sync_wait.timeout_ms = 50; // max dt tolerance, typical should be 23
+      ret = do_sync_control(m->cam_sync_fd, CAM_SYNC_WAIT, &sync_wait, sizeof(sync_wait));
+      if (ret != 0) {
+        LOGE("failed to wait for sync: %d %d", ret, sync_wait.sync_obj);
+        // TODO: handle frame drop cleanly
+      }
     }
 
     // TODO: this is wrong for ISP-processed images
@@ -866,11 +868,13 @@ void SpectraCamera::enqueue_buffer(int i, bool dp) {
   }
   sync_objs[i] = sync_create.sync_obj;
 
-  ret = do_cam_control(m->cam_sync_fd, CAM_SYNC_CREATE, &sync_create, sizeof(sync_create));
-  if (ret != 0) {
-    LOGE("failed to create fence: %d %d", ret, sync_create.sync_obj);
+  if (is_raw) {
+    ret = do_cam_control(m->cam_sync_fd, CAM_SYNC_CREATE, &sync_create, sizeof(sync_create));
+    if (ret != 0) {
+      LOGE("failed to create fence: %d %d", ret, sync_create.sync_obj);
+    }
+    sync_objs_bps_out[i] = sync_create.sync_obj;
   }
-  sync_objs_bps_out[i] = sync_create.sync_obj;
 
   // schedule request with camera request manager
   struct cam_req_mgr_sched_request req_mgr_sched_request = {0};
@@ -896,8 +900,11 @@ void SpectraCamera::camera_map_bufs() {
     // map our VisionIPC bufs into ISP memory
     struct cam_mem_mgr_map_cmd mem_mgr_map_cmd = {0};
     mem_mgr_map_cmd.mmu_hdls[0] = m->device_iommu;
-    mem_mgr_map_cmd.mmu_hdls[1] = m->icp_device_iommu;
-    mem_mgr_map_cmd.num_hdl = 2;
+    mem_mgr_map_cmd.num_hdl = 1;
+    if (is_raw) {
+      mem_mgr_map_cmd.num_hdl = 2;
+      mem_mgr_map_cmd.mmu_hdls[1] = m->icp_device_iommu;
+    }
     mem_mgr_map_cmd.flags = CAM_MEM_FLAG_HW_READ_WRITE;
 
     // RAW bayer images
@@ -1043,7 +1050,7 @@ void SpectraCamera::configICP() {
   memset(cfg, 0, sizeof(BpsCfg));
 
   cfg->cmdData.images[0].info.format = IMAGE_FORMAT_MIPI_12;
-  cfg->cmdData.images[0].info.bayerOrder = FIRST_PIXEL_B;  // TODO: get this from sensor->bayer_pattern
+  cfg->cmdData.images[0].info.bayerOrder = FIRST_PIXEL_GR;  // TODO: get this from sensor->bayer_pattern
   cfg->cmdData.images[0].info.dimensions.widthPixels = sensor->frame_width;
   cfg->cmdData.images[0].info.dimensions.heightLines = sensor->frame_height;
   cfg->cmdData.images[0].bufferLayout[0].bufferStride = sensor->frame_stride;
@@ -1170,9 +1177,11 @@ void SpectraCamera::linkDevices() {
   ret = device_control(m->isp_fd, CAM_START_DEV, session_handle, isp_dev_handle);
   LOGD("start isp: %d", ret);
   assert(ret == 0);
-  ret = device_control(m->icp_fd, CAM_START_DEV, session_handle, icp_dev_handle);
-  LOGD("start icp: %d", ret);
-  assert(ret == 0);
+  if (is_raw) {
+    ret = device_control(m->icp_fd, CAM_START_DEV, session_handle, icp_dev_handle);
+    LOGD("start icp: %d", ret);
+    assert(ret == 0);
+  }
 }
 
 void SpectraCamera::camera_close() {
@@ -1183,8 +1192,10 @@ void SpectraCamera::camera_close() {
     // LOGD("stop sensor: %d", ret);
     int ret = device_control(m->isp_fd, CAM_STOP_DEV, session_handle, isp_dev_handle);
     LOGD("stop isp: %d", ret);
-    ret = device_control(m->icp_fd, CAM_STOP_DEV, session_handle, icp_dev_handle);
-    LOGD("stop icp: %d", ret);
+    if (is_raw) {
+      ret = device_control(m->icp_fd, CAM_STOP_DEV, session_handle, icp_dev_handle);
+      LOGD("stop icp: %d", ret);
+    }
     ret = device_control(csiphy_fd, CAM_STOP_DEV, session_handle, csiphy_dev_handle);
     LOGD("stop csiphy: %d", ret);
 
@@ -1210,8 +1221,10 @@ void SpectraCamera::camera_close() {
     LOGD("-- Release devices");
     ret = device_control(m->isp_fd, CAM_RELEASE_DEV, session_handle, isp_dev_handle);
     LOGD("release isp: %d", ret);
-    ret = device_control(m->icp_fd, CAM_RELEASE_DEV, session_handle, icp_dev_handle);
-    LOGD("release icp: %d", ret);
+    if (is_raw) {
+      ret = device_control(m->icp_fd, CAM_RELEASE_DEV, session_handle, icp_dev_handle);
+      LOGD("release icp: %d", ret);
+    }
     ret = device_control(csiphy_fd, CAM_RELEASE_DEV, session_handle, csiphy_dev_handle);
     LOGD("release csiphy: %d", ret);
 
