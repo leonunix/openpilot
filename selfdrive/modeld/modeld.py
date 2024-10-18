@@ -77,7 +77,7 @@ class ModelState:
       'prev_desired_curv': np.zeros((1,(ModelConstants.HISTORY_BUFFER_LEN+1), ModelConstants.PREV_DESIRED_CURV_LEN), dtype=np.float32),
       'features_buffer': np.zeros((1, ModelConstants.HISTORY_BUFFER_LEN,  ModelConstants.FEATURE_LEN), dtype=np.float32),
     }
-    #TODO this only works on some backends like, verified on CLANG
+    #TODO this only works on some backends, verified on CLANG
     self.tensor_inputs = {k: Tensor.from_blob(mv_address(v), v.shape, dtype=dtypes.float) for k, v in self.numpy_inputs.items()} # type: ignore
 
     with open(METADATA_PATH, 'rb') as f:
