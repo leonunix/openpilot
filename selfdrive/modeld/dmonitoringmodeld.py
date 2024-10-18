@@ -71,7 +71,7 @@ class ModelState:
   def __init__(self, cl_ctx):
     assert ctypes.sizeof(DMonitoringModelResult) == OUTPUT_SIZE * ctypes.sizeof(ctypes.c_float)
     self.numpy_inputs = {'calib': np.zeros((1, CALIB_LEN), dtype=np.float32)}
-    #TODO this only works on some backends like, verified on QCOM
+    #TODO this only works on some backends like, verified on CLANG
     self.tensor_inputs = {k: Tensor.from_blob(mv_address(v), v.shape, dtype=dtypes.float) for k, v in self.numpy_inputs.items()}
     self.tensor_inputs['input_img'] = None
 
