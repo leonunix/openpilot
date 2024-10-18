@@ -5,7 +5,7 @@ from openpilot.system.hardware import TICI
 if TICI:
   GPU_BACKEND = 'QCOM'
 else:
-  GPU_BACKEND = 'CLANG'
+  GPU_BACKEND = 'GPU'
 os.environ[GPU_BACKEND] = '1'
 import time
 import pickle
@@ -123,6 +123,7 @@ class ModelState:
         self.tensor_inputs['input_imgs'] = Tensor.from_blob(rawbuf_ptr, IMG_INPUT_SHAPE, dtype=dtypes.uint8, device='QCOM')
         self.tensor_inputs['big_input_imgs'] = Tensor.from_blob(big_rawbuf_ptr, IMG_INPUT_SHAPE, dtype=dtypes.uint8, device='QCOM')
     else:
+      self.tensor_inputs = {k: Tensor(v) for k,v in self.numpy_inputs.items()}
       self.tensor_inputs['input_imgs'] = Tensor(self.frame.buffer_from_cl(input_imgs_cl)).reshape(IMG_INPUT_SHAPE)
       self.tensor_inputs['big_input_imgs'] = Tensor(self.wide_frame.buffer_from_cl(big_input_imgs_cl)).reshape(IMG_INPUT_SHAPE)
 
