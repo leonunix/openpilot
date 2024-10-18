@@ -31,7 +31,6 @@ from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.selfdrive.modeld.models.commonmodel_pyx import ModelFrame, CLContext
 
 from tinygrad.tensor import Tensor
-import ctypes, array
 from tinygrad.dtype import dtypes
 from tinygrad.helpers import to_mv, mv_address
 Tensor.manual_seed(1337)
@@ -80,8 +79,6 @@ class ModelState:
     }
     #TODO this only works on some backends like, verified on QCOM
     self.tensor_inputs = {k: Tensor.from_blob(mv_address(v), v.shape, dtype=dtypes.float) for k, v in self.numpy_inputs.items()}
-    self.tensor_inputs['input_imgs'] = None
-    self.tensor_inputs['big_input_imgs'] = None
 
     with open(METADATA_PATH, 'rb') as f:
       model_metadata = pickle.load(f)
@@ -118,7 +115,7 @@ class ModelState:
 
     if TICI:
       # The imgs tensors are backed by opencl memory, only need init once
-      if self.tensor_inputs['input_imgs'] is None:
+      if 'input_imgs' not in self.tensor_inputs:
         cl_buf_desc_ptr = to_mv(input_imgs_cl.mem_address, 8).cast('Q')[0]
         big_cl_buf_desc_ptr = to_mv(big_input_imgs_cl.mem_address, 8).cast('Q')[0]
         rawbuf_ptr = to_mv(cl_buf_desc_ptr, 0x100).cast('Q')[20] # offset 0xA0 is a raw gpu pointer.
