@@ -21,7 +21,7 @@ from cereal.messaging import PubMaster, SubMaster
 from msgq.visionipc import VisionIpcClient, VisionStreamType, VisionBuf
 from openpilot.common.swaglog import cloudlog
 from openpilot.common.params import Params
-from openpilot.common.realtime import config_realtime_process
+from openpilot.common.realtime import set_realtime_priority
 from openpilot.selfdrive.modeld.runners import ModelRunner, Runtime
 from openpilot.selfdrive.modeld.models.commonmodel_pyx import CLContext, cl_from_visionbuf
 from openpilot.selfdrive.modeld.parse_model_outputs import sigmoid
@@ -134,7 +134,7 @@ def get_driverstate_packet(model_output: np.ndarray, frame_id: int, location_ts:
 def main():
   gc.disable()
   setproctitle(PROCESS_NAME)
-  config_realtime_process(7, 54)
+  set_realtime_priority(1)
 
   cl_context = CLContext()
   model = ModelState(cl_context)
