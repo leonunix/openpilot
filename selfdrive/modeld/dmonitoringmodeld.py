@@ -5,7 +5,7 @@ from openpilot.system.hardware import TICI
 if TICI:
   GPU_BACKEND = 'QCOM'
 else:
-  GPU_BACKEND = 'GPU'
+  GPU_BACKEND = 'CLANG'
 os.environ[GPU_BACKEND] = '1'
 import gc
 import math
