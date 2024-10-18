@@ -78,7 +78,7 @@ class ModelState:
       'features_buffer': np.zeros((1, ModelConstants.HISTORY_BUFFER_LEN,  ModelConstants.FEATURE_LEN), dtype=np.float32),
     }
     #TODO this only works on some backends like, verified on QCOM
-    self.tensor_inputs = {k: Tensor.from_blob(mv_address(v), v.shape, dtype=dtypes.float) for k, v in self.numpy_inputs.items()} # type: ignore 
+    self.tensor_inputs = {k: Tensor.from_blob(mv_address(v), v.shape, dtype=dtypes.float) for k, v in self.numpy_inputs.items()} # type: ignore
 
     with open(METADATA_PATH, 'rb') as f:
       model_metadata = pickle.load(f)
