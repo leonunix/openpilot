@@ -22,11 +22,10 @@ from msgq.visionipc import VisionIpcClient, VisionStreamType, VisionBuf
 from openpilot.common.swaglog import cloudlog
 from openpilot.common.params import Params
 from openpilot.common.realtime import set_realtime_priority
-from openpilot.selfdrive.modeld.runners import ModelRunner, Runtime
 from openpilot.selfdrive.modeld.models.commonmodel_pyx import CLContext, cl_from_visionbuf
 from openpilot.selfdrive.modeld.parse_model_outputs import sigmoid
 from tinygrad.tensor import Tensor
-from tinygrad.helpers import getenv, to_mv, mv_address
+from tinygrad.helpers import to_mv, mv_address
 from tinygrad.dtype import dtypes
 
 CALIB_LEN = 3
@@ -68,7 +67,6 @@ class DMonitoringModelResult(ctypes.Structure):
 class ModelState:
   inputs: dict[str, np.ndarray]
   output: np.ndarray
-  model: ModelRunner
 
   def __init__(self, cl_ctx):
     assert ctypes.sizeof(DMonitoringModelResult) == OUTPUT_SIZE * ctypes.sizeof(ctypes.c_float)

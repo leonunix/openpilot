@@ -33,7 +33,7 @@ from openpilot.selfdrive.modeld.models.commonmodel_pyx import ModelFrame, CLCont
 from tinygrad.tensor import Tensor
 import ctypes, array
 from tinygrad.dtype import dtypes
-from tinygrad.helpers import getenv, to_mv, mv_address
+from tinygrad.helpers import to_mv, mv_address
 Tensor.manual_seed(1337)
 Tensor.no_grad = True
 
