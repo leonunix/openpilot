@@ -7,7 +7,7 @@ export OPENBLAS_NUM_THREADS=1
 export VECLIB_MAXIMUM_THREADS=1
 
 if [ -z "$AGNOS_VERSION" ]; then
-  export AGNOS_VERSION="11.1"
+  export AGNOS_VERSION="11.1-1733274"
 fi
 
 export STAGING_ROOT="/data/safe_staging"
