@@ -1,9 +1,9 @@
 [
   {
     "name": "boot",
-    "url": "https://gitlab.com/commaai/ci-artifacts/-/raw/agnos-builder/pr-392/boot-560e14cd7ae876f422d03d485c4925d40456d54509c7743bf6920418dde1fc64.img.xz",
-    "hash": "560e14cd7ae876f422d03d485c4925d40456d54509c7743bf6920418dde1fc64",
-    "hash_raw": "560e14cd7ae876f422d03d485c4925d40456d54509c7743bf6920418dde1fc64",
+    "url": "https://gitlab.com/commaai/ci-artifacts/-/raw/agnos-builder/pr-392/boot-7ea8c9b597c92c61a437b3519d6200268c787d586cebf65eb45142f435ecf164.img.xz",
+    "hash": "7ea8c9b597c92c61a437b3519d6200268c787d586cebf65eb45142f435ecf164",
+    "hash_raw": "7ea8c9b597c92c61a437b3519d6200268c787d586cebf65eb45142f435ecf164",
     "size": 16119808,
     "sparse": false,
     "full_check": true,
@@ -11,9 +11,9 @@
   },
   {
     "name": "system",
-    "url": "https://gitlab.com/commaai/ci-artifacts/-/raw/agnos-builder/pr-392/system-552cc5ff22dce083e84f06fa87e09406969ca0f0d78444e266985b55d7c882f5.img.xz",
-    "hash": "552cc5ff22dce083e84f06fa87e09406969ca0f0d78444e266985b55d7c882f5",
-    "hash_raw": "552cc5ff22dce083e84f06fa87e09406969ca0f0d78444e266985b55d7c882f5",
+    "url": "https://gitlab.com/commaai/ci-artifacts/-/raw/agnos-builder/pr-392/system-3d2c5ec984c99479b007ef16e19b793d6215df2ddf0e7870e5957c74de698132.img.xz",
+    "hash": "3d2c5ec984c99479b007ef16e19b793d6215df2ddf0e7870e5957c74de698132",
+    "hash_raw": "3d2c5ec984c99479b007ef16e19b793d6215df2ddf0e7870e5957c74de698132",
     "size": 4404019200,
     "sparse": false,
     "full_check": false,
