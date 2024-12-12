@@ -1,9 +1,9 @@
 [submodule "panda"]
   path = panda
-url=git@github.com:leonunix/panda.git
+url=https://github.com/leonunix/panda.git
 [submodule "opendbc"]
   path = opendbc_repo
-url=git@github.com:leonunix/opendbc-origin.git
+url=https://github.com/leonunix/opendbc-origin.git
 [submodule "msgq"]
   path = msgq_repo
   url = ../../commaai/msgq.git
